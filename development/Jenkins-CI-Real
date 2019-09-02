@@ -55,7 +55,7 @@ pipeline {
         stage ('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', 'b76ccfeb-b32d-41c0-b116-c85c72168576'){
+                    docker.withRegistry('', 'docker-hub-cred'){
                         myImage.push()
                 }
                 }
@@ -65,7 +65,7 @@ pipeline {
             steps {
                 script {
                     dir ('development'){
-                        withCredentials([usernamePassword(credentialsId: 'b6218c54-9fe9-4052-8da9-58322b94e248', 
+                        withCredentials([usernamePassword(credentialsId: 'master, 
                         passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git branch ${nextVersion}"
                         sh "git checkout ${nextVersion}"
