@@ -68,12 +68,12 @@ pipeline {
             steps {
                 script {
                     dir ('development'){
-                       
+                       sh "echo ${GIT_PASS}"
                         withCredentials([usernamePassword(credentialsId: 'master', 
                         passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git branch ${nextVersion}"
                         sh "git checkout ${nextVersion}"
-                        sh 'git push https://yossibnv1506:Yossi1506!@github.com/yossibnv1506/CI-CD-Project'
+                        sh 'git push https://yossibnv1506:Yossi1506\\!@github.com/yossibnv1506/CI-CD-Project'
                     }
                     }
                     
