@@ -10,7 +10,7 @@ pipeline {
                     target= input(
                             id: 'userInput', message: 'Enter target IP',
                             parameters: [
-                                string(defaultValue: '0.0.0.0',
+                                string(defaultValue: '3.85.9.252',
                                        description: 'ip address',
                                        name: 'IP')])
                 dir('Release'){
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script{
                     dir ('development') {
-                    myImage = docker.build("johnmops/python-app:${nextVersion}", "./app")
+                    myImage = docker.build("yossibnv/python-app:${nextVersion}", "./app")
                     myImage.withRun('-p 80:80 --name python') {c ->
                       try{
                           sh 'sleep 1'
@@ -55,9 +55,12 @@ pipeline {
         stage ('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', 'docker-hub-cred'){
-                        myImage.push()
-                }
+                 //   withCredentials([usernamePassword( credentialsId: 'docker-hub-cred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')])
+                      docker.withRegistry('', 'docker-hub-cred')
+                         {     
+                           myImage.push()
+                        }
+                      
                 }
             }
         }
@@ -65,11 +68,11 @@ pipeline {
             steps {
                 script {
                     dir ('development'){
-                        withCredentials([usernamePassword(credentialsId: 'master, 
+                        withCredentials([usernamePassword(credentialsId: 'master', 
                         passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git branch ${nextVersion}"
                         sh "git checkout ${nextVersion}"
-                        sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/JohnMops/CI-CD-Project'
+                        sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/yossibnv/CI-CD-Project'
                     }
                     }
                     
@@ -87,7 +90,7 @@ pipeline {
                         sh "sed -i 's/ipaddr/${target}/g' dev.json"
                         sh "git add dev.json"
                         sh "git commit -m 'CI approved ${nextVersion}'"
-                        sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/JohnMops/Release"
+                        sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/yossibnv/Release"
                         sh 'docker image prune -a -f --filter "until=1h"'
         }
         }
