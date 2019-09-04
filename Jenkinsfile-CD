@@ -19,7 +19,7 @@ pipeline {
                     }
                     dir('IAC'){
                         deleteDir()
-                        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'master', url: 'https://github.com/yossibnv1506/infra']]])
+                        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'master', url: 'https://github.com/yossibnv1506/IAC']]])
                     }
                 }
             }
@@ -41,10 +41,11 @@ pipeline {
             steps {
                 dir ('IAC/Ansible'){
                 script {
+                     sh "pwd"
                      sh "sed -i 's/host/${hostIP}/g' hosts"
                      sh "sed -i 's/host/${hostIP}/g' group_vars/all"
                      sh "sed -i 's/experimentVersion/${experimentVersion}/g' group_vars/all"
-                     sh 'ansible-playbook -i hosts -u ubuntu -b  --private-key=/var/jenkins_home/ansible/YosKey.pem play.yml'
+                     sh 'ansible-playbook  -i hosts -u ubuntu -b  --private-key=/var/jenkins_home/Yoskey.pem play.yml'
                 }
                 }
             }
