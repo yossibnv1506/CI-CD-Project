@@ -10,16 +10,18 @@ pipeline {
                     target= input(
                             id: 'userInput', message: 'Enter target IP',
                             parameters: [
-                                string(defaultValue: '3.85.9.252',
+                                string(defaultValue: '3.87.229.213',
                                        description: 'ip address',
                                        name: 'IP')])
                 dir('Release'){
+                sh "pwd "    
+                sh "ls -lah"
                 deleteDir()
-                checkout([$class: 'GitSCM', branches: [[name: '*/Dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'b6218c54-9fe9-4052-8da9-58322b94e248', url: 'https://github.com/JohnMops/Release/']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/Dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'master', url: 'https://github.com/yossibnv1506/Release/']]])
                 }
                 dir('development'){
                 deleteDir()
-                checkout([$class: 'GitSCM', branches: [[name: '*/Dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'b6218c54-9fe9-4052-8da9-58322b94e248', url: 'https://github.com/JohnMops/CI-CD-Project']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/Dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'master', url: 'https://github.com/yossibnv1506/CI-CD-Project']]])
                 sh "git fetch --all"
                 CurrentVersion = sh script: "git branch -r | cut -d'/' -f2 | grep -v -e master -e HEAD -e Dev | sort -r | head -1 ", returnStdout: true
                 CurrentVersion = CurrentVersion.trim()
@@ -68,11 +70,12 @@ pipeline {
             steps {
                 script {
                     dir ('development'){
+                       sh "echo ${GIT_PASS}"
                         withCredentials([usernamePassword(credentialsId: 'master', 
                         passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git branch ${nextVersion}"
                         sh "git checkout ${nextVersion}"
-                        sh 'git push https://${GIT_USER}:${GIT_PASS}@github.com/yossibnv/CI-CD-Project'
+                        sh 'git push https://yossibnv1506:Yossi1506\\!@github.com/yossibnv1506/CI-CD-Project'
                     }
                     }
                     
@@ -83,14 +86,14 @@ pipeline {
     post {
         success {
              dir('Release') {
-                        withCredentials([usernamePassword(credentialsId: 'b6218c54-9fe9-4052-8da9-58322b94e248', 
+                        withCredentials([usernamePassword(credentialsId: 'master', 
                         passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git checkout Dev"
                         sh "sed -i 's/${CurrentVersion}/${nextVersion}/g' dev.json"
                         sh "sed -i 's/ipaddr/${target}/g' dev.json"
                         sh "git add dev.json"
                         sh "git commit -m 'CI approved ${nextVersion}'"
-                        sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/yossibnv/Release"
+                        sh "git push https://yossibnv1506:Yossi1506!@github.com/yossibnv1506/Release"
                         sh 'docker image prune -a -f --filter "until=1h"'
         }
         }
