@@ -45,7 +45,7 @@ pipeline {
                      sh "sed -i 's/host/${hostIP}/g' hosts"
                      sh "sed -i 's/host/${hostIP}/g' group_vars/all"
                      sh "sed -i 's/experimentVersion/${experimentVersion}/g' group_vars/all"
-                     sh 'ansible-playbook  -i hosts -u ubuntu -b  --private-key=/var/jenkins_home/Yoskey.pem play.yml'
+                     sh 'ansible-playbook -vvvv -i hosts -u ubuntu -b  --private-key=/var/jenkins_home/Yoskey.pem play.yml'
                 }
                 }
             }
